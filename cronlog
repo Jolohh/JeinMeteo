@@ -1,0 +1,81 @@
+interface not up, will try again in 1 second
+interface not up, will try again in 1 second
+interface not up, will try again in 1 second
+interface not up, will try again in 1 second
+interface not up, will try again in 1 second
+interface not up, will try again in 1 second
+interface not up, will try again in 1 second
+interface not up, will try again in 1 second
+interface not up, will try again in 1 second
+interface not up, will try again in 1 second
+interface not up, will try again in 1 second
+interface not up, will try again in 1 second
+interface not up, will try again in 1 second
+interface not up, will try again in 1 second
+interface not up, will try again in 1 second
+interface not up, will try again in 1 second
+interface not up, will try again in 1 second
+interface not up, will try again in 1 second
+interface not up, will try again in 1 second
+interface not up, will try again in 1 second
+interface not up, will try again in 1 second
+interface not up, will try again in 1 second
+interface not up, will try again in 1 second
+interface not up, will try again in 1 second
+interface not up, will try again in 1 second
+interface not up, will try again in 1 second
+interface not up, will try again in 1 second
+interface not up, will try again in 1 second
+default via 139.13.199.254 dev eth0
+[('teamB/temperature', 41.19045639038086, 1), ('teamB/humidity', 38.57006072998047, 1), ('teamB/pressure', 1029.44091796875, 1), ('teamB/pm2.5', 2.8, 1), ('teamB/pm10', 12.2, 1), ('teamB/date', '2026/03/31-16:20:27', 1)]
+[('teamB/temperature', 41.28703689575195, 1), ('teamB/humidity', 37.82021713256836, 1), ('teamB/pressure', 1029.42236328125, 1), ('teamB/pm2.5', 2.2, 1), ('teamB/pm10', 11.1, 1), ('teamB/date', '2026/03/31-16:21:08', 1)]
+[('teamB/temperature', 41.28703689575195, 1), ('teamB/humidity', 37.49538803100586, 1), ('teamB/pressure', 1029.391845703125, 1), ('teamB/pm2.5', 2.1, 1), ('teamB/pm10', 9.0, 1), ('teamB/date', '2026/03/31-16:21:39', 1)]
+[('teamB/temperature', 41.46088790893555, 1), ('teamB/humidity', 37.76557159423828, 1), ('teamB/pressure', 1029.3974609375, 1), ('teamB/pm2.5', 2.6, 1), ('teamB/pm10', 12.3, 1), ('teamB/date', '2026/03/31-16:22:10', 1)]
+[('teamB/temperature', 41.42225646972656, 1), ('teamB/humidity', 37.97807693481445, 1), ('teamB/pressure', 1029.40771484375, 1), ('teamB/pm2.5', 2.5, 1), ('teamB/pm10', 10.6, 1), ('teamB/date', '2026/03/31-16:22:40', 1)]
+[('teamB/temperature', 41.48020553588867, 1), ('teamB/humidity', 38.063079833984375, 1), ('teamB/pressure', 1029.47802734375, 1), ('teamB/pm2.5', 2.5, 1), ('teamB/pm10', 13.5, 1), ('teamB/date', '2026/03/31-16:23:11', 1)]
+[('teamB/temperature', 41.38362121582031, 1), ('teamB/humidity', 37.17359161376953, 1), ('teamB/pressure', 1029.51171875, 1), ('teamB/pm2.5', 2.0, 1), ('teamB/pm10', 11.8, 1), ('teamB/date', '2026/03/31-16:23:42', 1)]
+[('teamB/temperature', 41.30635452270508, 1), ('teamB/humidity', 37.686641693115234, 1), ('teamB/pressure', 1029.49560546875, 1), ('teamB/pm2.5', 2.5, 1), ('teamB/pm10', 11.4, 1), ('teamB/date', '2026/03/31-16:24:12', 1)]
+[('teamB/temperature', 41.3256721496582, 1), ('teamB/humidity', 37.73521423339844, 1), ('teamB/pressure', 1029.395751953125, 1), ('teamB/pm2.5', 2.3, 1), ('teamB/pm10', 7.7, 1), ('teamB/date', '2026/03/31-16:24:43', 1)]
+[('teamB/temperature', 41.171138763427734, 1), ('teamB/humidity', 37.84450149536133, 1), ('teamB/pressure', 1029.475341796875, 1), ('teamB/pm2.5', 2.7, 1), ('teamB/pm10', 14.1, 1), ('teamB/date', '2026/03/31-16:25:13', 1)]
+[('teamB/temperature', 41.074554443359375, 1), ('teamB/humidity', 37.829322814941406, 1), ('teamB/pressure', 1029.490234375, 1), ('teamB/pm2.5', 2.4, 1), ('teamB/pm10', 13.7, 1), ('teamB/date', '2026/03/31-16:25:44', 1)]
+[('teamB/temperature', 41.074554443359375, 1), ('teamB/humidity', 37.522708892822266, 1), ('teamB/pressure', 1029.4404296875, 1), ('teamB/pm2.5', 2.7, 1), ('teamB/pm10', 9.9, 1), ('teamB/date', '2026/03/31-16:26:15', 1)]
+[('teamB/temperature', 40.82343673706055, 1), ('teamB/humidity', 37.72307205200195, 1), ('teamB/pressure', 1029.51123046875, 1), ('teamB/pm2.5', 1.9, 1), ('teamB/pm10', 9.7, 1), ('teamB/date', '2026/03/31-16:26:45', 1)]
+[('teamB/temperature', 40.8620719909668, 1), ('teamB/humidity', 37.74735641479492, 1), ('teamB/pressure', 1029.515380859375, 1), ('teamB/pm2.5', 2.3, 1), ('teamB/pm10', 9.8, 1), ('teamB/date', '2026/03/31-16:27:16', 1)]
+[('teamB/temperature', 40.74617004394531, 1), ('teamB/humidity', 37.000553131103516, 1), ('teamB/pressure', 1029.47607421875, 1), ('teamB/pm2.5', 2.7, 1), ('teamB/pm10', 14.9, 1), ('teamB/date', '2026/03/31-16:27:46', 1)]
+[('teamB/temperature', 40.591636657714844, 1), ('teamB/humidity', 38.038795471191406, 1), ('teamB/pressure', 1029.52197265625, 1), ('teamB/pm2.5', 2.9, 1), ('teamB/pm10', 14.9, 1), ('teamB/date', '2026/03/31-16:28:17', 1)]
+[('teamB/temperature', 40.6882209777832, 1), ('teamB/humidity', 37.60467529296875, 1), ('teamB/pressure', 1029.52734375, 1), ('teamB/pm2.5', 2.3, 1), ('teamB/pm10', 11.4, 1), ('teamB/date', '2026/03/31-16:28:47', 1)]
+[('teamB/temperature', 40.57231903076172, 1), ('teamB/humidity', 37.732177734375, 1), ('teamB/pressure', 1029.55419921875, 1), ('teamB/pm2.5', 2.5, 1), ('teamB/pm10', 16.3, 1), ('teamB/date', '2026/03/31-16:29:18', 1)]
+[('teamB/temperature', 40.47573471069336, 1), ('teamB/humidity', 38.688453674316406, 1), ('teamB/pressure', 1029.542724609375, 1), ('teamB/pm2.5', 2.4, 1), ('teamB/pm10', 12.6, 1), ('teamB/date', '2026/03/31-16:29:49', 1)]
+[('teamB/temperature', 40.47573471069336, 1), ('teamB/humidity', 38.22397994995117, 1), ('teamB/pressure', 1029.53662109375, 1), ('teamB/pm2.5', 2.0, 1), ('teamB/pm10', 14.1, 1), ('teamB/date', '2026/03/31-16:30:19', 1)]
+[('teamB/temperature', 40.41778564453125, 1), ('teamB/humidity', 38.488094329833984, 1), ('teamB/pressure', 1029.531982421875, 1), ('teamB/pm2.5', 3.0, 1), ('teamB/pm10', 15.6, 1), ('teamB/date', '2026/03/31-16:30:50', 1)]
+[('teamB/temperature', 40.398468017578125, 1), ('teamB/humidity', 38.151119232177734, 1), ('teamB/pressure', 1029.561767578125, 1), ('teamB/pm2.5', 2.3, 1), ('teamB/pm10', 11.6, 1), ('teamB/date', '2026/03/31-16:31:20', 1)]
+[('teamB/temperature', 40.398468017578125, 1), ('teamB/humidity', 38.12986755371094, 1), ('teamB/pressure', 1029.5986328125, 1), ('teamB/pm2.5', 2.6, 1), ('teamB/pm10', 9.0, 1), ('teamB/date', '2026/03/31-16:31:51', 1)]
+[('teamB/temperature', 40.282569885253906, 1), ('teamB/humidity', 38.451663970947266, 1), ('teamB/pressure', 1029.576171875, 1), ('teamB/pm2.5', 2.3, 1), ('teamB/pm10', 9.1, 1), ('teamB/date', '2026/03/31-16:32:22', 1)]
+Traceback (most recent call last):
+  File "/usr/lib/python3/dist-packages/serial/serialposix.py", line 322, in open
+    self.fd = os.open(self.portstr, os.O_RDWR | os.O_NOCTTY | os.O_NONBLOCK)
+              ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/dev/ttyUSB0'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/unix/project/mqttPublisher.py", line 35, in <module>
+    print(data)
+    
+  File "/home/unix/project/mqttPublisher.py", line 19, in getMeasurement
+    try:
+    
+  File "/home/unix/project/.venv/lib/python3.13/site-packages/sds011/__init__.py", line 42, in __init__
+    self.ser = serial.Serial(port=serial_port,
+               ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+                             baudrate=baudrate,
+                             ^^^^^^^^^^^^^^^^^^
+                             timeout=timeout)
+                             ^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3/dist-packages/serial/serialutil.py", line 244, in __init__
+    self.open()
+    ~~~~~~~~~^^
+  File "/usr/lib/python3/dist-packages/serial/serialposix.py", line 325, in open
+    raise SerialException(msg.errno, "could not open port {}: {}".format(self._port, msg))
+serial.serialutil.SerialException: [Errno 2] could not open port /dev/ttyUSB0: [Errno 2] No such file or directory: '/dev/ttyUSB0'
