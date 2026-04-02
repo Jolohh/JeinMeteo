@@ -1,4 +1,5 @@
 import paho.mqtt.client as mqtt
+from config import IP, PORT, AUTH
 
 def on_Myconnect(client, userdata, flags, rc):
     print('Connected with result code '+str(rc))
@@ -11,8 +12,8 @@ def on_Mymessage(client, userdata, msg):
 client = mqtt.Client()
 client.on_connect = on_Myconnect
 client.on_message = on_Mymessage
-client.username_pw_set("user1","bouter20XX")
-client.connect("147.210.103.14", 1883, 60)
+client.username_pw_set(AUTH["username"],AUTH["password"])
+client.connect(IP, PORT, 60)
 client.loop_forever()
 
 

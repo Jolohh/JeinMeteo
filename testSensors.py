@@ -1,4 +1,3 @@
-
 import paho.mqtt.client as mqtt
 
 from sense_hat import SenseHat

@@ -1,10 +1,12 @@
 import sqlite3
 import paho.mqtt.client as mqtt
 from typing import Dict
+from config import IP, PORT, AUTH
 
 table_name: str = "sensors"
 subscriber_id: str = "teamB"
 database_name: str = "database.db"
+
 
 measure_types : Dict[str, str] = {
     "humidity": "REAL",
@@ -82,8 +84,8 @@ con.commit()
 client = mqtt.Client()
 client.on_connect = on_Myconnect
 client.on_message = on_MyMessage
-client.username_pw_set("user1", "bouter20XX")
-client.connect("147.210.103.14", 1883, 60)
+client.username_pw_set(AUTH["username"], AUTH["password"])
+client.connect(IP, PORT, 60)
 client.loop_forever()
 print("Connected to MQTT broker")
 

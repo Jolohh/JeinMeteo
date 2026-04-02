@@ -4,15 +4,8 @@ import time
 from datetime import datetime
 #Custom Lib: https://github.com/ikalchev/py-sds011.git
 from sds011 import SDS011
+from config import IP, PORT, AUTH, QOS
 
-#Configuration
-IP = "147.210.103.14"
-PORT = 1883
-AUTH = {
-    "username":"user1",
-    "password":"bouter20XX"
-}
-QOS = 1
 
 #Measurement Function
 def getMeasurement():
