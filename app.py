@@ -20,7 +20,7 @@ def get_weather():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM sensors ORDER BY date DESC")
+    cursor.execute("SELECT * FROM D15989B2AB111D0A ORDER BY date DESC")
     rows = [dict(row) for row in cursor.fetchall()]
     cursor.close()
     conn.close()
@@ -32,7 +32,7 @@ def get_latest():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM sensors ORDER BY date DESC LIMIT 1")
+    cursor.execute("SELECT * FROM D15989B2AB111D0A ORDER BY date DESC LIMIT 1")
     row = cursor.fetchone()
     cursor.close()
     conn.close()
