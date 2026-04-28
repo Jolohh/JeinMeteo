@@ -11,7 +11,7 @@ config.read("config.ini")
 
 
 
-database_name: str = "database.db"
+database_name: str = config["broker.config"]["database_name"]
 
 
 measurementTypes : Dict[str, str] = {
@@ -20,7 +20,8 @@ measurementTypes : Dict[str, str] = {
     "temperature": "REAL",
     "pm2.5": "REAL",
     "pm10": "REAL",
-    "date": "TEXT"
+    "date": "TEXT",
+    "battery_level":"REAL"
     }
 
 
@@ -33,6 +34,7 @@ measurementTypes : Dict[str, str] = {
 
 #endregion
 
+
 def insert_to_table(table_name,data_dict):
     con = sqlite3.connect(database_name)
     cur = con.cursor()
@@ -41,15 +43,16 @@ def insert_to_table(table_name,data_dict):
         "humidity": None,
         "pressure": None,
         "temperature": None,
-        "pm2.5": 0,
-        "pm10": 0,
-        "date": datetime.now().strftime("%Y/%m/%d-%H:%M:%S")
+        "pm2.5": None,
+        "pm10": None,
+        "date": datetime.now().strftime("%Y/%m/%d-%H:%M:%S"),
+        "battery_level": None
         }
     
     values_dict.update(data_dict)
 
     values = tuple(values_dict[col] for col in values_dict)
-    
+    print("values:",values)
     columns_string = ", ".join(f'"{name}" {type}' for name, type in measurementTypes.items())
 
     cur.execute(f"CREATE TABLE IF NOT EXISTS `{table_name}` ({columns_string})")
@@ -71,8 +74,9 @@ def on_connect(client, userdata, flags, rc):
 
 
 def on_message(client, userdata, msg):
-    print(msg.topic + " " + str(msg.payload))
+    print(datetime.now().strftime("%Y/%m/%d-%H:%M:%S"),": ",msg.topic + " " + str(msg.payload))
     identifier = msg.topic.split("/")[1]
+    
     
     data_dict = json.loads(msg.payload)
     

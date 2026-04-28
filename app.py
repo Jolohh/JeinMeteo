@@ -8,11 +8,17 @@ And for the website select the index.html -> open in browser
 from flask import Flask, jsonify
 from flask_cors import CORS
 import sqlite3
+import configparser
 
 app = Flask(__name__)
 CORS(app)
+config = configparser.ConfigParser()
+config.read("config.ini")
 
-DB_PATH = "database.db"
+
+
+DB_PATH = config["broker.config"]["database_name"]
+
 
 # returns all sensor data
 @app.route("/api/weather")
@@ -20,7 +26,7 @@ def get_weather():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM D15989B2AB111D0A ORDER BY date DESC")
+    cursor.execute("""SELECT * FROM "211097D05BECC882" ORDER BY date DESC""")
     rows = [dict(row) for row in cursor.fetchall()]
     cursor.close()
     conn.close()
@@ -32,7 +38,7 @@ def get_latest():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM D15989B2AB111D0A ORDER BY date DESC LIMIT 1")
+    cursor.execute("""SELECT * FROM "211097D05BECC882" ORDER BY date DESC LIMIT 1""")
     row = cursor.fetchone()
     cursor.close()
     conn.close()
@@ -42,4 +48,4 @@ def get_latest():
 
 if __name__ == "__main__":
     print("API running at http://localhost:5001")
-    app.run(debug=True, port=5001)
+    app.run(debug=True,host="0.0.0.0", port=5001)
