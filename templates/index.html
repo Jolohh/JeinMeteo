@@ -203,9 +203,10 @@
 <div id="charts-container"></div>
 
 <script>
-var API = "http://localhost:5001/api";
+var API = "http://192.168.1.143:5001/api";
 
 var SENSOR_CONFIG = {
+    "battery_voltage": { color: "d94f3b", unit: "V", min: 3.3, max: 4.7 },
     "temperature": { color: "#d94f3b", unit: "°C", min: 0, max: 40 },
     "humidity":    { color: "#3b7dd9", unit: "%",  min: 30, max: 60 },
     "pressure":    { color: "#7b3bd9", unit: "hPa", min: -100000, max:100000 },

@@ -5,7 +5,7 @@ Then open http://localhost:5001/api/weather in your browser to see the data (jso
 And for the website select the index.html -> open in browser
 """
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, render_template
 from flask_cors import CORS
 import sqlite3
 import configparser
@@ -18,6 +18,12 @@ config.read("config.ini")
 
 
 DB_PATH = config["broker.config"]["database_name"]
+
+# index page
+@app.route("/")
+def index():
+    return "index"
+    #return render_template("index.html")
 
 
 # returns all sensor data
@@ -45,6 +51,7 @@ def get_latest():
     if row is None:
         return jsonify({})
     return jsonify(dict(row))
+
 
 if __name__ == "__main__":
     print("API running at http://localhost:5001")
