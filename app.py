@@ -22,8 +22,8 @@ DB_PATH = config["broker.config"]["database_name"]
 # index page
 @app.route("/")
 def index():
-    return "index"
-    #return render_template("index.html")
+    #return "index"
+    return render_template("index.html")
 
 
 # returns all sensor data
@@ -54,5 +54,7 @@ def get_latest():
 
 
 if __name__ == "__main__":
-    print("API running at http://localhost:5001")
+    #print("API running at http://localhost:5001")
     app.run(debug=True,host="0.0.0.0", port=5001)
+#    context = ("server.crt","server.key")
+#    serve(app, host="192.168.1.143", port=80,ssl_context=context)
