@@ -3,3 +3,4 @@ venv
 config.ini
 __pycache__
 device_list.txt
+database*.db
