@@ -5,7 +5,7 @@ Then open http://localhost:5001/api/weather in your browser to see the data (jso
 And for the website select the index.html -> open in browser
 """
 
-from flask import Flask, jsonify, render_template
+from flask import Flask, jsonify, render_template, request
 from flask_cors import CORS
 import sqlite3
 import configparser
@@ -51,6 +51,19 @@ def get_latest():
     if row is None:
         return jsonify({})
     return jsonify(dict(row))
+
+
+@app.route("/api/weather/device")
+def get_weather_all():
+    device = request.args.get("dev_id")
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    cursor.execute(f"""SELECT * FROM "{device}" ORDER BY date DESC""")
+    rows = [dict(row) for row in cursor.fetchall()]
+    cursor.close()
+    conn.close()
+    return jsonify(rows)
 
 
 if __name__ == "__main__":

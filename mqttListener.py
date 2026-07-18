@@ -12,7 +12,7 @@ config.read("config.ini")
 
 
 database_name: str = config["broker.config"]["database_name"]
-
+device_registry: str = config["broker.config"]["device_registry"]
 
 measurementTypes : Dict[str, str] = {
     "humidity": "REAL",
@@ -25,12 +25,18 @@ measurementTypes : Dict[str, str] = {
     }
 
 
+def check_device_registry(id_string):
+    con = sqlite3.connect(device_registry)
+    cur = con.cursor()
+    cur.execute(f"CREATE TABLE IF NOT EXISTS devices (hwid INTEGER, index sid INTEGER)")
+    
+    
+    
+    
 
 
 
-#region global variables
-#dataLength = len(measurementTypes)
-#dataDict = {}
+
 
 #endregion
 

@@ -2,7 +2,7 @@ import sqlite3
 import matplotlib.pyplot as plt
 import numpy as np
 
-database_name = "database_new.db"
+database_name = "data/database_new.db"
 
 
 con = sqlite3.connect(database_name)
@@ -25,25 +25,30 @@ print("Tables:",tables)
 
 
 
-table = "211097D05BECC882"
+#table = "211097D05BECC882"
+table = """28463F17F7D0A774"""
 
 ref = cur.execute(f"""SELECT * FROM "{table}" """)
-print(ref.description)
+#print(ref.description)
 contents = cur.fetchall()
 
 #cur.execute(f"""PRAGMA table_info("{table}") """)
 
 #print(column_names)
-print(contents)
+#print(contents)
 
 
 # make data
 x = []
 y = []
 
+print("Differences:")
 for row in contents:
-    x.append(row[5])
+    x.append(row[5])#
+    print(row[0])
     y.append(row[0])
+
+
 
 
 # plot
