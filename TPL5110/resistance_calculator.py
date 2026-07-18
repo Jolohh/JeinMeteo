@@ -101,7 +101,7 @@ R = R_from_T(15*60)
 print("R in Ohms:",R)
 print("R in kOhms:",round(R/1000,2))
 
-Tnew = T_from_R(67*1000)
+Tnew = T_from_R(60*1000)
 
 print("T in seconds:",Tnew)
 print("T in minutes:",round(Tnew/60,2))
