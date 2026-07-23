@@ -2,8 +2,8 @@ import json
 import requests
 
 
-from src.jeinmeteo.configloader import ConfigLoader
-from src.jeinmeteo.device_registry import Device, Device_registry
+from jeinmeteo.configloader import ConfigLoader
+from jeinmeteo.device_registry import Device, Device_registry
 
 config = ConfigLoader("api.config").load()
 

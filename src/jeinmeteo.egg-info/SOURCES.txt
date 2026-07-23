@@ -1,0 +1,10 @@
+README.md
+pyproject.toml
+src/jeinmeteo/__init__.py
+src/jeinmeteo/api.py
+src/jeinmeteo/configloader.py
+src/jeinmeteo/device_registry.py
+src/jeinmeteo.egg-info/PKG-INFO
+src/jeinmeteo.egg-info/SOURCES.txt
+src/jeinmeteo.egg-info/dependency_links.txt
+src/jeinmeteo.egg-info/top_level.txt

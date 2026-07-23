@@ -1,5 +1,5 @@
 import sqlite3
-from src.jeinmeteo.configloader import ConfigLoader
+from jeinmeteo.configloader import ConfigLoader
 
 config = ConfigLoader("broker.config").load()
 
