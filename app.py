@@ -104,6 +104,13 @@ def get_stromzaehler():
     conn.close()
     return jsonify(rows)   
 
+
+@app.route("/api/devices")
+def get_devices():
+    devices = registry.get_devices_json()
+    print(devices)
+    return jsonify(devices)
+    
 if __name__ == "__main__":
     print("API running at http://localhost:5001")
     app.run(debug=True,host="0.0.0.0", port=5001)
