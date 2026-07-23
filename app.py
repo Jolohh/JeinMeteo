@@ -66,6 +66,18 @@ def get_weather_all():
     return jsonify(rows)
 
 
+
+@app.route("/api/stromzaehler")
+def get_stromzaehler():
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    cursor.execute("""SELECT * FROM "WattWaechter_6C6287" ORDER BY date DESC""")
+    rows = [dict(row) for row in cursor.fetchall()]
+    cursor.close()
+    conn.close()
+    return jsonify(rows)   
+
 if __name__ == "__main__":
     print("API running at http://localhost:5001")
     app.run(debug=True,host="0.0.0.0", port=5001)

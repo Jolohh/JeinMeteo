@@ -1,21 +1,26 @@
-import sqlite3
-import configparser
-
-config = configparser.ConfigParser()
-config.read("config.ini")
+from datetime import datetime
 
 
+values_dict = {
+    "humidity": None,
+    "pressure": None,
+    "temperature": None,
+    "pm2.5": None,
+    "pm10": None,
+    "date": datetime.now().strftime("%Y/%m/%d-%H:%M:%S"),
+    }
 
-device_registry: str = config["broker.config"]["device_registry"]
 
-def check_device_registry(id_string):
-    con = sqlite3.connect(device_registry)
-    cur = con.cursor()
-    cur.execute(f"CREATE TABLE IF NOT EXISTS devices (hwid REAL, sid INTEGER PRIMARY KEY)")
-    
-    cur.execute("SELECT hwid, sid FROM devices WHERE hwid = ?", (id_string,))
-    row = cur.fetchone()
-    
-    print(row)
-    
-check_device_registry("test")
+
+data_dict = {
+    "humidity": None,
+    "pressure": None,
+    "temperature": None,
+    "pm2.5": None,
+    "pm10": None,
+    "date": datetime.now().strftime("%Y/%m/%d-%H:%M:%S"),
+    "battery_level": None}
+
+values_dict.update(data_dict)
+
+print(values_dict)
