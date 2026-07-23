@@ -1,4 +1,4 @@
-from device_registry import Device_registry
+from config.device_registry import Device_registry
 from config.configloader import ConfigLoader
 
 registry = Device_registry()

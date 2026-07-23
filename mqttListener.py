@@ -4,7 +4,7 @@ from typing import Dict
 import json
 from datetime import datetime
 from config.configloader import ConfigLoader
-from device_registry import Device_registry
+from config.device_registry import Device_registry
 
 
 config = ConfigLoader("broker.config").load()
@@ -16,6 +16,7 @@ multisensorTypes = ConfigLoader("multisensor.types").load_dict()
 stromzaehlerTypes = ConfigLoader("stromzaehler.types").load_dict()
 
 registry = Device_registry()
+
 
 
 def insert_to_table(table_name,data_dict,types):
@@ -30,20 +31,10 @@ def insert_to_table(table_name,data_dict,types):
         else:
             values_dict[key] = None
     
-    #values_dict = {
-    #    "humidity": None,
-    #    "pressure": None,
-    #    "temperature": None,
-    #    "pm2.5": None,
-    #    "pm10": None,
-    #    "date": datetime.now().strftime("%Y/%m/%d-%H:%M:%S"),
-    #    "battery_level": None
-    #    }
-    
     values_dict.update(data_dict)
 
     values = tuple(values_dict[col] for col in values_dict)
-    #print("values:",values)
+
     columns_string = ", ".join(f'"{name}" {type}' for name, type in types.items())
 
     cur.execute(f"CREATE TABLE IF NOT EXISTS `{table_name}` ({columns_string})")
@@ -52,11 +43,7 @@ def insert_to_table(table_name,data_dict,types):
     ','.join(['?'] * len(values_dict))})""", values)
 
     con.commit()
-    
-    
-def insert_to_stromzaehler(table_name,data_dict,types):
-    con = sqlite3.connect(database_name)
-    cur = con.cursor()
+
 
 
 def on_connect(client, userdata, flags, rc):
@@ -70,7 +57,12 @@ def on_message(client, userdata, msg):
     hwid = msg.topic.split("/")[1]
     #data_dict = msg.payload
     data_dict = json.loads(msg.payload)
-    identifier = registry.check_hwid(hwid)
+    
+    device = registry.check_hwid(hwid)
+    if(device):
+        identifier = device.device_type
+    else:
+        identifier = None
     
     print("============================================")
     print("Hardware-Id:",hwid)
@@ -80,15 +72,16 @@ def on_message(client, userdata, msg):
     print("Identifier:",identifier)
     print("============================================")
 
-    if identifier[3] == "multisensor":
+    if identifier == "multisensor":
         insert_to_table(hwid,data_dict,multisensorTypes)
-    elif identifier[3] == "stromzaehler":
+    elif identifier == "stromzaehler":
         data_dict = data_dict["E320"]
         del data_dict["Meter_Number"]
         data_dict = {k.lower(): v for k,v in data_dict.items()}
         insert_to_table(hwid,data_dict,stromzaehlerTypes)
-        #insert_to_stromzaehler(hwid,data_dict)
-    
+
+
+
 client = mqtt.Client()
 client.on_connect = on_connect
 client.on_message = on_message

@@ -1,6 +1,7 @@
 import sqlite3
-import configparser
 from config.configloader import ConfigLoader
+
+
 
 config = ConfigLoader("broker.config").load()
 
@@ -8,8 +9,29 @@ registry_path : str = config["device_registry"]
 device_types = config["device_types"]
 
 
+
+class Device:
+    def __init__(self,
+                 id : str,
+                 hwid : str,
+                 name : str,
+                 device_type : str
+                 ):
+        
+        self.id = id
+        self.hwid = hwid
+        self.name = name
+        self.device_type = device_type
+        
+    @classmethod
+    def from_list(cls,l:list):
+        return cls(l[0],l[1],l[2],l[3])
+
+
+
 class DeviceTypeError(Exception):
     pass
+
 
 
 class Device_registry:
@@ -20,7 +42,7 @@ class Device_registry:
                             id INTEGER PRIMARY KEY, 
                             hwid text UNIQUE, 
                             name text UNIQUE, 
-                            type text)""")
+                            device_type text)""")
 
         
     def add_device(self, hwid:str, name:str, device_type:str):
@@ -28,7 +50,7 @@ class Device_registry:
             raise DeviceTypeError("""Gerätetyp muss "multisensor" oder "stromzaehler" sein""")
         else:
             try:
-                self.cur.execute(f"INSERT INTO devices (hwid,name,type) VALUES(?,?,?)",[hwid,name,device_type])
+                self.cur.execute(f"INSERT INTO devices (hwid,name,device_type) VALUES(?,?,?)",[hwid,name,device_type])
             except sqlite3.IntegrityError:
                 raise
             self.con.commit()
@@ -37,23 +59,27 @@ class Device_registry:
     def get_devices(self):
         self.cur.execute("SELECT * FROM devices ORDER BY id ASC")
         devices = self.cur.fetchall()
-        return devices 
+        l = []
+        for device in devices:
+            l.append(Device.from_list(device))
+        return l 
+
 
     def check_hwid(self,hwid):
         devices = self.get_devices()
         for device in devices:
-            if hwid == device[1]:
+            if hwid == device.hwid:
                 return device
-            
-        return [None,None,None,None]
+        return None
+        
         
     def check_name(self,name):
         devices = self.get_devices()
         for device in devices:
-            if name == device[2]:
+            if name == device.name:
                 return device
             
-        return [None,None,None,None]
-            
+        return None
+        
             
 

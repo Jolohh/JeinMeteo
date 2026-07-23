@@ -8,22 +8,28 @@ And for the website select the index.html -> open in browser
 from flask import Flask, jsonify, render_template, request
 from flask_cors import CORS
 import sqlite3
-import configparser
+
+from config.configloader import ConfigLoader
+from config.device_registry import Device_registry
 
 app = Flask(__name__)
 CORS(app)
-config = configparser.ConfigParser()
-config.read("config.ini")
 
 
+config = ConfigLoader("broker.config").load()
+DB_PATH = config["database_name"]
 
-DB_PATH = config["broker.config"]["database_name"]
+
+registry = Device_registry()
+
+
 
 # index page
 @app.route("/")
 def index():
     #return "index"
     return render_template("index.html")
+
 
 
 # returns all sensor data
@@ -37,6 +43,8 @@ def get_weather():
     cursor.close()
     conn.close()
     return jsonify(rows)
+
+
 
 # returns only the latest reading
 @app.route("/api/weather/latest")
@@ -53,17 +61,35 @@ def get_latest():
     return jsonify(dict(row))
 
 
-@app.route("/api/weather/device")
+
+@app.route("/api/device")
 def get_weather_all():
-    device = request.args.get("dev_id")
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    cursor = conn.cursor()
-    cursor.execute(f"""SELECT * FROM "{device}" ORDER BY date DESC""")
-    rows = [dict(row) for row in cursor.fetchall()]
-    cursor.close()
-    conn.close()
-    return jsonify(rows)
+    hwid = request.args.get("hwid")
+    name = request.args.get("name")
+    device_found = False
+    
+    if device := registry.check_hwid(hwid):
+        hwid = device.hwid
+        device_found = True
+
+    if device := registry.check_name(name):
+        hwid = device.hwid
+        device_found = True
+        
+
+    if device_found:
+        conn = sqlite3.connect(DB_PATH)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        cursor.execute(f"""SELECT * FROM "{hwid}" ORDER BY date DESC""")
+            
+        rows = [dict(row) for row in cursor.fetchall()]
+        cursor.close()
+        conn.close()
+            
+        return jsonify(rows)
+    
+    return "Device not found"
 
 
 

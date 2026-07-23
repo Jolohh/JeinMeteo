@@ -1,9 +1,9 @@
 import paho.mqtt.client as mqtt
 from datetime import datetime
-import configparser
+from config.configloader import ConfigLoader
 
-config = configparser.ConfigParser()
-config.read("config.ini")
+config = ConfigLoader("broker.config").load()
+
 
 
 def on_connect(client, userdata, flags, rc):
@@ -28,9 +28,7 @@ def on_message(client, userdata, msg):
 client = mqtt.Client()
 client.on_connect = on_connect
 client.on_message = on_message
-client.username_pw_set(config["broker.config"]["username"], config["broker.config"]["password"])
-print(config["broker.config"]["password"])
-client.connect(config["broker.config"]["ip"], config.getint("broker.config","port"), 60)
+client.username_pw_set(config["username"], config["password"])
+client.connect(config["ip"], int(config["port"]), 60)
 client.loop_forever()
 print("Connected to MQTT broker")
-
