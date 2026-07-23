@@ -64,6 +64,13 @@ class Device_registry:
             l.append(Device.from_list(device))
         return l 
 
+    def get_devices_json(self):
+        l = self.get_devices()
+        l_dict = []
+        for device in l:
+            l_dict.append(device.__dict__)
+        return l_dict
+
 
     def check_hwid(self,hwid):
         devices = self.get_devices()
