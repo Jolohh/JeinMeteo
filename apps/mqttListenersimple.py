@@ -1,6 +1,6 @@
 import paho.mqtt.client as mqtt
 from datetime import datetime
-from config.configloader import ConfigLoader
+from jeinmeteo.configloader import ConfigLoader
 
 config = ConfigLoader("broker.config").load()
 

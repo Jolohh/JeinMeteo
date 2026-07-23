@@ -1,13 +1,13 @@
 import sqlite3
 import matplotlib.pyplot as plt
 import matplotlib
-from matplotlibtools import set_xstep, set_ystep, set_xunit, set_yunit
+from apps.datadisplay.matplotlibtools import set_xstep, set_ystep, set_xunit, set_yunit
 import numpy as np
 import requests
 import json
 from datetime import datetime,timedelta
 
-import matplotlibtools
+import apps.datadisplay.matplotlibtools as matplotlibtools
 
 API_URL = "http://sensornet.fritz.box/api/weather"
 

@@ -1,7 +1,5 @@
 import sqlite3
-from config.configloader import ConfigLoader
-
-
+from src.jeinmeteo.configloader import ConfigLoader
 
 config = ConfigLoader("broker.config").load()
 
@@ -64,6 +62,7 @@ class Device_registry:
             l.append(Device.from_list(device))
         return l 
 
+
     def get_devices_json(self):
         l = self.get_devices()
         l_dict = []
@@ -87,6 +86,8 @@ class Device_registry:
                 return device
             
         return None
+    
+
         
             
 

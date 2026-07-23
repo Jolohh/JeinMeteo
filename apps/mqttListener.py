@@ -3,8 +3,8 @@ import paho.mqtt.client as mqtt
 from typing import Dict
 import json
 from datetime import datetime
-from config.configloader import ConfigLoader
-from config.device_registry import Device_registry
+from jeinmeteo.configloader import ConfigLoader
+from jeinmeteo.device_registry import Device_registry
 
 
 config = ConfigLoader("broker.config").load()

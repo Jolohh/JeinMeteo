@@ -9,8 +9,8 @@ from flask import Flask, jsonify, render_template, request
 from flask_cors import CORS
 import sqlite3
 
-from config.configloader import ConfigLoader
-from config.device_registry import Device_registry
+from jeinmeteo.configloader import ConfigLoader
+from jeinmeteo.device_registry import Device_registry
 
 app = Flask(__name__)
 CORS(app)
