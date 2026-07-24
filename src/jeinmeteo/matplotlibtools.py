@@ -1,8 +1,6 @@
 from matplotlib.axes import Axes
-import matplotlib.pyplot as plt
-
 from matplotlib.ticker import FormatStrFormatter
-
+import matplotlib.dates as mdates
 import numpy as np
 from math import floor, ceil
 
@@ -33,10 +31,24 @@ def set_ystep(ax: Axes, step: float, keeplim: bool = True):
         ax.set_ylim(bottom,top)
 
     
-def set_xunit(unit):
-    plt.gca().xaxis.set_major_formatter(FormatStrFormatter(f'%d {unit}'))
+def set_xunit(axis: Axes, unit: str):
+    axis.xaxis.set_major_formatter(FormatStrFormatter(f'%g {unit}'))
 
 
-def set_yunit(unit):
-    plt.gca().yaxis.set_major_formatter(FormatStrFormatter(f'%d {unit}'))
-    
+def set_yunit(axis: Axes, unit: str):
+    axis.yaxis.set_major_formatter(FormatStrFormatter(f'%g {unit}'))
+
+def set_time_axis(axis: Axes,auto_range=True,min=0,max=24,step=2):
+    axis.xaxis.remove_overlapping_locs = False
+
+    axis.xaxis.set_major_locator(mdates.HourLocator(12))
+    axis.xaxis.set_major_formatter(mdates.DateFormatter("%Y/%m/%d"))
+    if not auto_range:
+        axis.xaxis.set_minor_locator(mdates.HourLocator(np.arange(min,max,step)))
+    else:
+        axis.xaxis.set_major_locator(mdates.AutoDateLocator())
+        
+    axis.xaxis.set_minor_formatter(mdates.DateFormatter("%H"))
+
+    axis.tick_params(which="minor", axis="x", labelsize=8)
+    axis.tick_params(which="major", axis="x", pad=20, size=2)

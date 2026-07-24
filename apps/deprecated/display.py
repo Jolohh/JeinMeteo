@@ -1,13 +1,12 @@
 import sqlite3
 import matplotlib.pyplot as plt
-import matplotlib
-from apps.datadisplay.matplotlibtools import set_xstep, set_ystep, set_xunit, set_yunit
+
+from jeinmeteo.matplotlibtools import set_xstep, set_ystep, set_xunit, set_yunit
 import numpy as np
 import requests
 import json
 from datetime import datetime,timedelta
 
-import apps.datadisplay.matplotlibtools as matplotlibtools
 
 API_URL = "http://sensornet.fritz.box/api/weather"
 
@@ -81,8 +80,8 @@ ax.plot(x, y,marker="x",linestyle="-", linewidth=2.0)
 ax.set_ylim(0,60)
 ax.set_xlim(-24,0)
 
-set_xunit("h")
-set_yunit("min")
+set_xunit(ax,"h")
+set_yunit(ax,"min")
 
 set_xstep(ax,2)
 set_ystep(ax,15)

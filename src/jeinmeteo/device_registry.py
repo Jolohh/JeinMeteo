@@ -54,7 +54,7 @@ class Device_registry:
             self.con.commit()
 
 
-    def get_devices(self):
+    def get_devices(self)-> list[Device]:
         self.cur.execute("SELECT * FROM devices ORDER BY id ASC")
         devices = self.cur.fetchall()
         l = []

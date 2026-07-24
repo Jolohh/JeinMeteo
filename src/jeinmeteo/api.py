@@ -13,7 +13,7 @@ class JeinMeteoAPI:
         self.API_URL = config["api_url"]
         
     def get_data(self,name):
-        request = requests.get(self.API_URL,params={"name":name})
+        request = requests.get(f"{self.API_URL}/device",params={"name":name})
         response = json.loads(request.content)
         return response
     
