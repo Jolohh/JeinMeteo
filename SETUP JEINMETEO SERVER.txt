@@ -1,0 +1,86 @@
+SETUP JEINMETEO SERVER
+
+1. Clone Repo
+2. create venv
+	- activate with: source .venv/bin/activate
+3. install requirements.txt
+4. install custom lib: pip install -e .
+
+--- Setup Webserver ---
+pip install flask gunicorn (merge into requirements?)
+gunicorn --bind 0.0.0.0:5000 app:app (manuelles starten vom server)
+
+sudo nano /etc/systemd/system/JeinMeteo.service
+Paste:
+
+[Unit]
+Description=JeinMeteo App
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=jonah
+WorkingDirectory=/home/pi/myapp
+ExecStart=/home/pi/myapp/.venv/bin/gunicorn --bind 0.0.0.0:5000 app:app
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+
+And edit file paths to correct path
+
+sudo systemctl daemon-reload
+sudo systemctl enable JeinMeteo
+sudo systemctl start JeinMeteo
+
+
+--- Setup mqtt-Broker ---
+sudo apt install -y mosquitto mosquitto-clients
+
+sudo systemctl enable mosquitto
+sudo systemctl start mosquitto
+sudo systemctl status mosquitto
+
+create config:
+sudo nano /etc/mosquitto/conf.d/local.conf
+
+create user: 
+sudo mosquitto_passwd -c /etc/mosquitto/passwd myuser
+sudo chown mosquitto:mosquitto /etc/mosquitto/passwd
+sudo chmod 640 /etc/mosquitto/passwd
+
+restart broker: 
+sudo systemctl restart mosquitto
+
+copy defaultconfig.ini as config.ini and set username and password for broker
+
+--- setup Mqtt-Listener ---
+sudo nano /etc/systemd/system/JeinMeteo-mqtt.service
+
+[Unit]
+Description=JeinMeteo MQTT Listener
+After=network-online.target mosquitto.service
+Wants=network-online.target mosquitto.service
+# Use for non-local broker
+#After=network-online.target
+#Wants=network-online.target
+
+[Service]
+User=jonah
+WorkingDirectory=/home/jonah/JeinMeteo
+ExecStart=/home/jonah/JeinMeteo/venv/bin/python -u mqtt_listener.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+
+
+sudo systemctl daemon-reload
+sudo systemctl enable --now JeinMeteo-mqtt
+
+--- other ---
+
+- apt-get install screen
+- add devices with add_device.py
