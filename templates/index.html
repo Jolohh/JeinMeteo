@@ -203,7 +203,7 @@
 <div id="charts-container"></div>
 
 <script>
-var API = "http://sensornet.fritz.box:80/api";
+var API = {{ api_url|tojson }};
 
 var SENSOR_CONFIG = {
     "battery_voltage": { color: "d94f3b", unit: "V", min: 3.30, max: 4.70 },

@@ -1,5 +1,5 @@
-from src.jeinmeteo.device_registry import Device_registry
-from src.jeinmeteo.configloader import ConfigLoader
+from jeinmeteo.device_registry import Device_registry
+from jeinmeteo.configloader import ConfigLoader
 
 registry = Device_registry()
 config = ConfigLoader("broker.config").load()

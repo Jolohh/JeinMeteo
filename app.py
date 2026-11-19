@@ -1,4 +1,4 @@
-""""
+"""
 Weather Station API
 To run: python app.py
 Then open http://localhost:5001/api/weather in your browser to see the data (json)
@@ -8,6 +8,7 @@ And for the website select the index.html -> open in browser
 from flask import Flask, jsonify, render_template, request
 from flask_cors import CORS
 import sqlite3
+import socket
 
 from jeinmeteo.configloader import ConfigLoader
 from jeinmeteo.device_registry import Device_registry
@@ -17,18 +18,32 @@ CORS(app)
 
 
 config = ConfigLoader("broker.config").load()
+api_config = ConfigLoader("api.config").load()
 DB_PATH = config["database_name"]
 
 
 registry = Device_registry()
 
+def get_local_ip():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        s.connect(("8.8.8.8", 80))  # no data is sent, it only picks the outgoing interface
+        return s.getsockname()[0]
+    except OSError:
+        return "127.0.0.1"
+    finally:
+        s.close()
 
 
 # index page
 @app.route("/")
 def index():
     #return "index"
-    return render_template("index.html")
+    api_url = api_config["api_url"]
+    if api_url == "None":
+        api_url = "http://"+ get_local_ip()+":80/api"
+    print("using api_url:",api_url)
+    return render_template("index.html",api_url=api_url)
 
 
 
@@ -38,7 +53,7 @@ def get_weather():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
-    cursor.execute("""SELECT * FROM "211097D05BECC882" ORDER BY date DESC""")
+    cursor.execute("""SELECT * FROM "28463F17F7D0A774" ORDER BY date DESC""")
     rows = [dict(row) for row in cursor.fetchall()]
     cursor.close()
     conn.close()
@@ -52,7 +67,7 @@ def get_latest():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
-    cursor.execute("""SELECT * FROM "211097D05BECC882" ORDER BY date DESC LIMIT 1""")
+    cursor.execute("""SELECT * FROM "28463F17F7D0A774" ORDER BY date DESC LIMIT 1""")
     row = cursor.fetchone()
     cursor.close()
     conn.close()
