@@ -43,7 +43,7 @@ def index():
     if api_url == "None":
         api_url = "http://"+ get_local_ip()+":80/api"
     print("using api_url:",api_url)
-    return render_template("index.html",api_url=api_url)
+    return render_template("index(1).html",api_url=api_url)
 
 
 

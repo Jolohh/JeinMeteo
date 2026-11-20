@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BDX-WHV Weather Station</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0"></script>
+    <style>
+        body { font-family: Arial, sans-serif; background: #ffffff; margin: 0; padding: 20px 30px; color: #222; }
+        h1 { font-size: 22px; font-weight: bold; margin-bottom: 4px; }
+        .subtitle { font-size: 13px; color: #888; margin-bottom: 25px; }
+
+        .source-bar { display: flex; gap: 10px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
+        .source-bar label { font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; }
+        .source-bar select { font-size: 14px; padding: 8px 12px; border: 1px solid #222; min-width: 240px; outline: none; background: #fff; }
+
+        .cards { display: flex; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
+        .card { flex: 1 1 140px; border: 1px solid #e0e0e0; padding: 16px; }
+        .card .label { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 1px; }
+        .card .value { font-size: 26px; font-weight: bold; margin-top: 6px; }
+
+        .legend { display: flex; gap: 20px; margin-bottom: 25px; font-size: 12px; color: #666; }
+        .legend-item { display: flex; align-items: center; gap: 5px; }
+        .legend-dot { width: 10px; height: 10px; display: inline-block; }
+        .legend-dot.red { background: #d94f3b; }
+        .legend-dot.blue { background: #3b7dd9; }
+        .legend-dot.green { background: #2ea043; }
+
+        .filters { display: flex; gap: 10px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
+        .filters label { font-size: 12px; color: #666; }
+        .filters input, .filters select { font-size: 13px; padding: 6px 10px; border: 1px solid #ddd; outline: none; }
+        .filters button { font-size: 13px; padding: 6px 16px; border: 1px solid #222; background: #222; color: #fff; cursor: pointer; }
+        .filters button.reset { background: #fff; color: #666; border: 1px solid #ddd; }
+
+        h2 { font-size: 15px; font-weight: bold; margin: 25px 0 10px 0; padding-bottom: 6px; border-bottom: 1px solid #eee; }
+
+        .table-scroll { max-height: 420px; overflow-y: auto; border: 1px solid #e0e0e0; margin-bottom: 30px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th { text-align: left; padding: 8px 12px; border-bottom: 2px solid #222; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #555; position: sticky; top: 0; background: #fff; }
+        td { padding: 8px 12px; border-bottom: 1px solid #f0f0f0; }
+        tr:hover { background: #fafafa; }
+
+        .val-high { color: #d94f3b; font-weight: bold; }
+        .val-low { color: #3b7dd9; font-weight: bold; }
+        .val-ok { color: #2ea043; }
+
+        .chart-section { border: 1px solid #e0e0e0; padding: 16px; margin-bottom: 14px; }
+        .chart-section h3 { font-size: 13px; font-weight: bold; margin: 0 0 10px 0; color: #444; }
+        .chart-container { height: 220px; }
+        .error { color: #d94f3b; }
+
+        @media (max-width: 600px) { body { padding: 15px; } }
+    </style>
+</head>
+<body>
+
+<h1>BDX-WHV Weather Station</h1>
+<p class="subtitle">Citizen Science — Environmental Sensor Network</p>
+
+<div class="source-bar">
+    <label for="source-select">Device:</label>
+    <select id="source-select"><option>Loading...</option></select>
+</div>
+
+<div class="cards" id="cards-container"></div>
+
+<div class="legend">
+    <div class="legend-item"><span class="legend-dot red"></span> Above recommended range</div>
+    <div class="legend-item"><span class="legend-dot blue"></span> Below recommended range</div>
+    <div class="legend-item"><span class="legend-dot green"></span> Within recommended range</div>
+</div>
+
+<div class="filters">
+    <label>Measurement:</label>
+    <select id="sensor-filter"><option value="all">All</option></select>
+    <label>From:</label>
+    <input type="date" id="date-start">
+    <label>To:</label>
+    <input type="date" id="date-end">
+    <button onclick="loadData()">Apply</button>
+    <button class="reset" onclick="resetFilters()">Reset</button>
+</div>
+
+<h2>Recent Readings</h2>
+<div class="table-scroll">
+    <table>
+        <thead id="table-head"><tr><th>Loading...</th></tr></thead>
+        <tbody id="table-body"><tr><td>Loading...</td></tr></tbody>
+    </table>
+</div>
+
+<h2>Charts</h2>
+<div id="charts-container"></div>
+
+<script>
+var API = {{ api_url|tojson }};
+
+/* ---- Device selection config ----------------------------------------
+   /api/devices returns [{id, name, hwid, device_type}, ...]
+   /api/device?name=<name> returns the readings (newest first)
+*/
+var DEVICE_PARAM = "name";
+function deviceId(d)    { return d.name; }
+function deviceLabel(d) { return d.name + (d.device_type ? " (" + d.device_type + ")" : ""); }
+
+var sources = [];
+var currentSource = null;
+
+var SENSOR_CONFIG = {
+    "battery_level": { color: "#d94f3b", unit: "V" },
+    "battery_voltage": { color: "#d94f3b", unit: "V", min: 3.30, max: 4.70 },
+    "temperature": { color: "#d94f3b", unit: "°C", min: 0, max: 40 },
+    "humidity":    { color: "#3b7dd9", unit: "%",  min: 30, max: 60 },
+    "pressure":    { color: "#7b3bd9", unit: "hPa", min: -100000, max: 100000 },
+    "pm2.5":       { color: "#d98f3b", unit: "µg/m³", max: 25 },
+    "pm25":        { color: "#d98f3b", unit: "µg/m³", max: 25 },
+    "pm10":        { color: "#3bbf5e", unit: "µg/m³", max: 40 }
+};
+
+var DEFAULT_COLORS = ["#e6554a", "#4a90d9", "#8e44ad", "#e67e22", "#27ae60", "#c0392b", "#2980b9", "#f39c12"];
+
+function getConfig(key) {
+    var lower = key.toLowerCase();
+    if (SENSOR_CONFIG[lower]) return SENSOR_CONFIG[lower];
+    var idx = Math.max(sensorKeys.indexOf(key), 0) % DEFAULT_COLORS.length;
+    return { color: DEFAULT_COLORS[idx], unit: "" };
+}
+
+function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+function safe(val) {
+    if (val === null || val === undefined || isNaN(Number(val))) return "--";
+    return Number(val).toFixed(2);
+}
+
+function getColorClass(key, val) {
+    if (val === null || val === undefined) return "";
+    var cfg = getConfig(key);
+    if (cfg.max !== undefined && val > cfg.max) return "val-high";
+    if (cfg.min !== undefined && val < cfg.min) return "val-low";
+    if (cfg.max !== undefined || cfg.min !== undefined) return "val-ok";
+    return "";
+}
+
+var sensorKeys = [];
+var charts = {};
+var lastData = [];
+var initialized = false;
+var requestCounter = 0;
+
+function destroyCharts() {
+    for (var i in charts) { if (charts[i]) charts[i].destroy(); }
+    charts = {};
+}
+
+function buildUI(keys) {
+    destroyCharts();
+    sensorKeys = keys;
+
+    var cardsHtml = "";
+    for (var i = 0; i < keys.length; i++) {
+        var cfg = getConfig(keys[i]);
+        cardsHtml += '<div class="card">' +
+            '<div class="label">' + esc(keys[i]) + '</div>' +
+            '<div class="value" id="cur-' + i + '" style="color:' + cfg.color + '">--</div>' +
+            '</div>';
+    }
+    document.getElementById("cards-container").innerHTML = cardsHtml;
+
+    var select = document.getElementById("sensor-filter");
+    var opts = '<option value="all">All</option>';
+    for (var i = 0; i < keys.length; i++) {
+        opts += '<option value="' + i + '">' + esc(keys[i]) + '</option>';
+    }
+    select.innerHTML = opts;
+
+    var headHtml = "<tr><th>Date</th>";
+    for (var i = 0; i < keys.length; i++) {
+        var cfg = getConfig(keys[i]);
+        var header = keys[i];
+        if (cfg.unit) header += " (" + cfg.unit + ")";
+        headHtml += "<th>" + esc(header) + "</th>";
+    }
+    document.getElementById("table-head").innerHTML = headHtml + "</tr>";
+
+    var chartsHtml = "";
+    for (var i = 0; i < keys.length; i++) {
+        var cfg = getConfig(keys[i]);
+        var title = keys[i];
+        if (cfg.unit) title += " (" + cfg.unit + ")";
+        chartsHtml += '<div class="chart-section" id="box-' + i + '">' +
+            '<h3>' + esc(title) + '</h3>' +
+            '<div class="chart-container"><canvas id="chart-' + i + '"></canvas></div>' +
+            '</div>';
+    }
+    document.getElementById("charts-container").innerHTML = chartsHtml;
+
+    for (var i = 0; i < keys.length; i++) {
+        charts[i] = makeChart("chart-" + i, getConfig(keys[i]).color);
+    }
+}
+
+function makeChart(id, color) {
+    var ctx = document.getElementById(id).getContext("2d");
+    return new Chart(ctx, {
+        type: "line",
+        data: { labels: [], datasets: [{ data: [], borderColor: color, borderWidth: 1.5, fill: false, pointRadius: 0, tension: 0.3 }] },
+        options: {
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { type: "time", time: { unit: "hour" }, grid: { display: false } },
+                y: { beginAtZero: false, grid: { color: "#f0f0f0" } }
+            }
+        }
+    });
+}
+
+// Collect all measurement keys across the rows (devices may report different values per row)
+function detectKeys(rows) {
+    var keys = [];
+    var limit = Math.min(rows.length, 200);
+    for (var r = 0; r < limit; r++) {
+        for (var k in rows[r]) {
+            if (k.toLowerCase() === "date" || keys.indexOf(k) !== -1) continue;
+            if (rows.some(function(row) { return row[k] !== null && row[k] !== undefined; })) keys.push(k);
+        }
+    }
+    return keys;
+}
+
+function parseDate(str) {
+    // "2026/11/20-22:05:22" -> local Date
+    var m = String(str).match(/^(\d{4})[\/-](\d{2})[\/-](\d{2})[-T ](\d{2}):(\d{2}):(\d{2})/);
+    if (!m) return new Date(str);
+    return new Date(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +m[6]);
+}
+
+function sameKeys(a, b) {
+    return a.length === b.length && a.every(function(k, i) { return k === b[i]; });
+}
+
+/* ---- Source handling ---- */
+
+function sourceUrl(src) {
+    if (src.deviceId !== undefined) {
+        return API + "/device?" + DEVICE_PARAM + "=" + encodeURIComponent(src.deviceId);
+    }
+    return API + src.url;
+}
+
+function fillSourceSelect() {
+    var select = document.getElementById("source-select");
+    select.innerHTML = "";
+    sources.forEach(function(src, i) {
+        var opt = document.createElement("option");
+        opt.value = i;
+        opt.textContent = src.label;
+        select.appendChild(opt);
+    });
+    select.value = "0";
+}
+
+function loadSources() {
+    sources = [];
+    fetch(API + "/devices")
+        .then(function(res) { return res.json(); })
+        .then(function(devices) {
+            if (!Array.isArray(devices)) devices = devices.devices || [];
+            devices.forEach(function(d) {
+                sources.push({ label: deviceLabel(d), deviceId: deviceId(d) });
+            });
+            if (sources.length === 0) {
+                document.getElementById("source-select").innerHTML = "<option>No devices registered</option>";
+                document.getElementById("table-body").innerHTML = '<tr><td>No devices found.</td></tr>';
+                return;
+            }
+            fillSourceSelect();
+            currentSource = sources[0];
+            loadData();
+        })
+        .catch(function() {
+            document.getElementById("source-select").innerHTML = "<option>Error</option>";
+            document.getElementById("table-body").innerHTML = '<tr><td class="error">Cannot load device list. Is Flask running?</td></tr>';
+        });
+}
+
+document.getElementById("source-select").addEventListener("change", function() {
+    currentSource = sources[Number(this.value)];
+    initialized = false;       // rebuild cards/table/charts for the new key set
+    lastData = [];
+    document.getElementById("date-start").value = "";
+    document.getElementById("date-end").value = "";
+    loadData();
+});
+
+/* ---- Data loading ---- */
+
+function loadData() {
+    if (!currentSource) return;
+    var myRequest = ++requestCounter;
+    var mySource = currentSource;
+
+    fetch(sourceUrl(mySource))
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            // ignore stale responses if the user switched device meanwhile
+            if (myRequest !== requestCounter || mySource !== currentSource) return;
+
+            if (!Array.isArray(data)) data = data ? [data] : [];
+
+            if (data.length === 0) {
+                destroyCharts();
+                initialized = false;
+                document.getElementById("cards-container").innerHTML = "";
+                document.getElementById("charts-container").innerHTML = "";
+                document.getElementById("table-head").innerHTML = "<tr><th>Date</th></tr>";
+                document.getElementById("table-body").innerHTML = '<tr><td>No data for this device.</td></tr>';
+                return;
+            }
+
+            lastData = data;
+            var keys = detectKeys(data);
+
+            // (Re)build UI on first load, device change, or if the measurement set changed
+            if (!initialized || !sameKeys(keys, sensorKeys)) {
+                var prevFilter = document.getElementById("sensor-filter").value;
+                buildUI(keys);
+                if (initialized && prevFilter !== "all" && Number(prevFilter) < keys.length) {
+                    document.getElementById("sensor-filter").value = prevFilter;
+                }
+                initialized = true;
+            }
+
+            var sensorIdx = document.getElementById("sensor-filter").value;
+            var startDate = document.getElementById("date-start").value;
+            var endDate = document.getElementById("date-end").value;
+
+            var filtered = data;
+            if (startDate) filtered = filtered.filter(function(d) { return d.date >= startDate.replace(/-/g, "/"); });
+            if (endDate) filtered = filtered.filter(function(d) { return d.date <= endDate.replace(/-/g, "/") + "-23:59:59"; });
+
+            for (var i = 0; i < sensorKeys.length; i++) {
+                var show = (sensorIdx === "all" || sensorIdx === String(i));
+                document.getElementById("box-" + i).style.display = show ? "block" : "none";
+            }
+
+            var sorted = filtered.slice().reverse();
+            var dates = sorted.map(function(d) { return parseDate(d.date); });
+
+            for (var i = 0; i < sensorKeys.length; i++) {
+                var key = sensorKeys[i];
+                charts[i].data.labels = dates;
+                charts[i].data.datasets[0].data = sorted.map(function(d) { return d[key]; });
+                charts[i].update();
+            }
+
+            var tbody = document.getElementById("table-body");
+            tbody.innerHTML = filtered.map(function(d) {
+                var html = "<tr><td>" + esc(d.date) + "</td>";
+                for (var i = 0; i < sensorKeys.length; i++) {
+                    var key = sensorKeys[i];
+                    var val = d[key];
+                    html += '<td class="' + getColorClass(key, val) + '">' + safe(val) + '</td>';
+                }
+                return html + "</tr>";
+            }).join("");
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="' + (sensorKeys.length + 1) + '">No data found.</td></tr>';
+            }
+
+            // Cards: derive from newest row (data is newest-first), unless a dedicated /latest endpoint exists
+            if (!mySource.latestUrl) updateCards(data[0]);
+        })
+        .catch(function() {
+            if (myRequest !== requestCounter) return;
+            document.getElementById("table-body").innerHTML = '<tr><td class="error">Cannot connect to API. Is Flask running?</td></tr>';
+        });
+}
+
+function updateCards(row) {
+    if (!initialized || !row) return;
+    for (var i = 0; i < sensorKeys.length; i++) {
+        var key = sensorKeys[i];
+        var cfg = getConfig(key);
+        var val = row[key];
+        var cls = getColorClass(key, val);
+        var el = document.getElementById("cur-" + i);
+        if (!el) continue;
+        var text = safe(val);
+        if (cfg.unit && text !== "--") text += " " + cfg.unit;
+        el.textContent = text;
+        el.style.color = cls === "val-high" ? "#d94f3b" :
+                         cls === "val-low"  ? "#3b7dd9" :
+                         cls === "val-ok"   ? "#2ea043" : cfg.color;
+    }
+}
+
+function loadLatest() {
+    if (!currentSource || !currentSource.latestUrl) return;
+    var mySource = currentSource;
+    fetch(API + mySource.latestUrl)
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            if (mySource !== currentSource) return;
+            updateCards(data);
+        })
+        .catch(function() {});
+}
+
+function resetFilters() {
+    document.getElementById("date-start").value = "";
+    document.getElementById("date-end").value = "";
+    document.getElementById("sensor-filter").value = "all";
+    loadData();
+}
+
+loadSources();
+setTimeout(loadLatest, 800);
+setInterval(function() { loadLatest(); loadData(); }, 30000);
+</script>
+
+</body>
+</html>
