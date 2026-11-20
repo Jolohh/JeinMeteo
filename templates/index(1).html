@@ -115,10 +115,13 @@ var SENSOR_CONFIG = {
     "pressure":    { color: "#7b3bd9", unit: "hPa", min: -100000, max: 100000 },
     "pm2.5":       { color: "#d98f3b", unit: "µg/m³", max: 25 },
     "pm25":        { color: "#d98f3b", unit: "µg/m³", max: 25 },
-    "pm10":        { color: "#3bbf5e", unit: "µg/m³", max: 40 }
+    "pm10":        { color: "#3bbf5e", unit: "µg/m³", max: 40 },
+    "power": { color: "#d98f3b", unit: "W",   label: "Power",           decimals: 0 },
+    "e_in":  { color: "#2980b9", unit: "kWh", label: "Energy imported", decimals: 3 },
+    "e_out": { color: "#27ae60", unit: "kWh", label: "Energy exported", decimals: 3 },
 };
 
-var DEFAULT_COLORS = ["#e6554a", "#4a90d9", "#8e44ad", "#e67e22", "#27ae60", "#c0392b", "#2980b9", "#f39c12"];
+var DEFAULT_COLORS = ["#e6554a", "#4a90d9", "#8e44ad", "#e67e22", "#27ae60", "#c0392b", "#2980b9", "#f39c12","#f39c12","#f39c12","#f39c12"];
 
 function getConfig(key) {
     var lower = key.toLowerCase();
@@ -127,13 +130,19 @@ function getConfig(key) {
     return { color: DEFAULT_COLORS[idx], unit: "" };
 }
 
+function getLabel(key) {
+    return getConfig(key).label || key;
+}
+
 function esc(s) {
     return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-function safe(val) {
+function safe(val, key) {
     if (val === null || val === undefined || isNaN(Number(val))) return "--";
-    return Number(val).toFixed(2);
+    var cfg = key ? getConfig(key) : {};
+    var d = (cfg.decimals !== undefined) ? cfg.decimals : 2;
+    return Number(val).toFixed(d);
 }
 
 function getColorClass(key, val) {
@@ -164,7 +173,7 @@ function buildUI(keys) {
     for (var i = 0; i < keys.length; i++) {
         var cfg = getConfig(keys[i]);
         cardsHtml += '<div class="card">' +
-            '<div class="label">' + esc(keys[i]) + '</div>' +
+            '<div class="label">' + esc(getLabel(keys[i])) + '</div>' +
             '<div class="value" id="cur-' + i + '" style="color:' + cfg.color + '">--</div>' +
             '</div>';
     }
@@ -173,14 +182,14 @@ function buildUI(keys) {
     var select = document.getElementById("sensor-filter");
     var opts = '<option value="all">All</option>';
     for (var i = 0; i < keys.length; i++) {
-        opts += '<option value="' + i + '">' + esc(keys[i]) + '</option>';
+        opts += '<option value="' + i + '">' + 	esc(getLabel(keys[i])) + '</option>';
     }
     select.innerHTML = opts;
 
     var headHtml = "<tr><th>Date</th>";
     for (var i = 0; i < keys.length; i++) {
         var cfg = getConfig(keys[i]);
-        var header = keys[i];
+        	var header = getLabel(keys[i]);
         if (cfg.unit) header += " (" + cfg.unit + ")";
         headHtml += "<th>" + esc(header) + "</th>";
     }
@@ -189,7 +198,7 @@ function buildUI(keys) {
     var chartsHtml = "";
     for (var i = 0; i < keys.length; i++) {
         var cfg = getConfig(keys[i]);
-        var title = keys[i];
+        var title = getLabel(keys[i]);
         if (cfg.unit) title += " (" + cfg.unit + ")";
         chartsHtml += '<div class="chart-section" id="box-' + i + '">' +
             '<h3>' + esc(title) + '</h3>' +
@@ -363,7 +372,7 @@ function loadData() {
                 for (var i = 0; i < sensorKeys.length; i++) {
                     var key = sensorKeys[i];
                     var val = d[key];
-                    html += '<td class="' + getColorClass(key, val) + '">' + safe(val) + '</td>';
+                    html += '<td class="' + getColorClass(key, val) + '">' + safe(val, key) + '</td>';
                 }
                 return html + "</tr>";
             }).join("");
@@ -390,7 +399,7 @@ function updateCards(row) {
         var cls = getColorClass(key, val);
         var el = document.getElementById("cur-" + i);
         if (!el) continue;
-        var text = safe(val);
+        var text = safe(val, key);
         if (cfg.unit && text !== "--") text += " " + cfg.unit;
         el.textContent = text;
         el.style.color = cls === "val-high" ? "#d94f3b" :
