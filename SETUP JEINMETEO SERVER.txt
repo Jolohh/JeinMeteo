@@ -6,6 +6,8 @@ SETUP JEINMETEO SERVER
 3. install requirements.txt
 4. install custom lib: pip install -e .
 
+
+
 --- Setup Webserver ---
 pip install flask gunicorn (merge into requirements?)
 gunicorn --bind 0.0.0.0:5000 app:app (manuelles starten vom server)
