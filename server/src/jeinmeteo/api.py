@@ -32,3 +32,4 @@ class JeinMeteoAPI:
                 print(e)
                 print("Device already registered, skipping...")
         return registry
+    
