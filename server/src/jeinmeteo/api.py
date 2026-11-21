@@ -11,9 +11,16 @@ config = ConfigLoader("api.config").load()
 class JeinMeteoAPI:
     def __init__(self) -> None:
         self.API_URL = config["api_url"]
+        if self.API_URL == "None":
+            raise Exception("API-URL not set in config.ini")
         
     def get_data(self,name):
         request = requests.get(f"{self.API_URL}/device",params={"name":name})
+        response = json.loads(request.content)
+        return response
+    
+    def get_latest(self,name):
+        request = requests.get(f"{self.API_URL}/device",params={"name":name,"latest":"true"})
         response = json.loads(request.content)
         return response
     

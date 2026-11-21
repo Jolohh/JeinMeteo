@@ -1,4 +1,4 @@
-import requests, time
+
 from jeinmeteo.configloader import ConfigLoader
 from jeinmeteo.api import JeinMeteoAPI
 
@@ -9,4 +9,4 @@ api = JeinMeteoAPI()
 devices = api.get_devices_json()
 
 for device in devices:
-    
+    api.get_latest(device["name"])

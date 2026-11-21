@@ -81,6 +81,8 @@ def get_latest():
 def get_weather_all():
     hwid = request.args.get("hwid")
     name = request.args.get("name")
+    latest = request.args.get(key="latest",default="false")
+    
     device_found = False
     
     if device := registry.check_hwid(hwid):
@@ -96,8 +98,10 @@ def get_weather_all():
         conn = sqlite3.connect(DB_PATH)
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
-        cursor.execute(f"""SELECT * FROM "{hwid}" ORDER BY date DESC""")
-            
+        if latest.lower() == "true":
+            cursor.execute(f"""SELECT * FROM "{hwid}" ORDER BY date DESC LIMIT 1""")
+        else:
+            cursor.execute(f"""SELECT * FROM "{hwid}" ORDER BY date DESC""")
         rows = [dict(row) for row in cursor.fetchall()]
         cursor.close()
         conn.close()
@@ -105,8 +109,6 @@ def get_weather_all():
         return jsonify(rows)
     
     return "Device not found"
-
-
 
 @app.route("/api/stromzaehler")
 def get_stromzaehler():
