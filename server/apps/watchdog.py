@@ -63,7 +63,7 @@ for device in devices:
 
     now_str = dt.datetime.now().strftime("%Y/%m/%d-%H:%M:%S")
     
-    # if sensor has not responded and notification can be sent
+    # if sensor has not responded and notification can be sent, send alert
     if dT > dt.timedelta(minutes=MAX_INTERVAL_MIN) and canNotify(device_path):    
         alert = f"[{now_str}]: {device["name"]} offline alert! , sensor has not responded in {format_timedelta(dT)}"
         print(alert)        
@@ -71,6 +71,7 @@ for device in devices:
         with open(device_path,"w") as f:
             f.write(now_str)
     
-    # If sensor has responded and state is active, reset state
+    # If sensor has responded and state is active, reset state, send alert
     elif dT < dt.timedelta(minutes=MAX_INTERVAL_MIN) and os.path.exists(device_path):
         os.remove(device_path)
+        alert = f"[{now_str}]: {device["name"]} is back online !"
