@@ -27,6 +27,7 @@
 #include "config.h"
 
 #define GPIO_DONE 11
+//#define GPIO_DONE 9
 #define BAT_ADC_CHANNEL 0
 #define BAT_MEAN_N 100
 #define WIFI_TIMEOUT 10000
@@ -169,14 +170,14 @@ int main() {
   {
     printf("error with wifi chip\n");
     sleep_ms(200);
-    gpio_put(GPIO_DONE,1);
+    //gpio_put(GPIO_DONE,1);
   }
   cyw43_arch_enable_sta_mode();
   cyw43_wifi_pm(&cyw43_state, CYW43_NO_POWERSAVE_MODE);
   if (cyw43_arch_wifi_connect_timeout_ms(WIFI_SSID, WIFI_PASSWORD, CYW43_AUTH_WPA2_AES_PSK,WIFI_TIMEOUT)) {
       printf("error with wifi\n");
       sleep_ms(200);
-      gpio_put(GPIO_DONE,1);
+      //gpio_put(GPIO_DONE,1);
   }
   printf("wifi: %lld ms\n", absolute_time_diff_us(t_start, get_absolute_time()) / 1000);
 
@@ -199,7 +200,7 @@ int main() {
   {
     printf("error with mqtt\n");
     sleep_ms(200);
-    gpio_put(GPIO_DONE,1);
+    //gpio_put(GPIO_DONE,1);
   }
   int mqtt_timeout = 0;
   while (!mqtt_client_is_connected(static_client)) {
@@ -207,7 +208,7 @@ int main() {
     mqtt_timeout++;
     if (mqtt_timeout > 2000) { // 5 second timeout
         printf("mqtt connection timeout\n");
-        gpio_put(GPIO_DONE, 1); 
+        //gpio_put(GPIO_DONE, 1); 
     }
   }
   
