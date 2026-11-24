@@ -38,7 +38,6 @@ def format_timedelta(td):
 
 
 
-
 def canNotify(path):
         if not os.path.exists(path):
             return True
@@ -53,23 +52,25 @@ def canNotify(path):
             
 
 
+# main function
 for device in devices:
     device_path = os.path.join(STATEFILE_LOCATION,device["name"]+"_state.txt")
-    
+
+    # get latest response and calculate difference to current time    
     latest = api.get_latest(device["name"])[0]
     timestamp = dt.datetime.strptime(latest["date"],"%Y/%m/%d-%H:%M:%S")
     dT = dt.datetime.now() - timestamp
 
     now_str = dt.datetime.now().strftime("%Y/%m/%d-%H:%M:%S")
     
-    
-    alerting = canNotify(device_path)
-    if dT > dt.timedelta(minutes=MAX_INTERVAL_MIN) and alerting:    
+    # if sensor has not responded and notification can be sent
+    if dT > dt.timedelta(minutes=MAX_INTERVAL_MIN) and canNotify(device_path):    
         alert = f"[{now_str}]: {device["name"]} offline alert! , sensor has not responded in {format_timedelta(dT)}"
         print(alert)        
         notify(alert)
         with open(device_path,"w") as f:
             f.write(now_str)
-
-    #elif dT > dt.timedelta(minutes=MAX_INTERVAL_MIN) and not alerting:
-    #    print("not enough time since last message")
+    
+    # If sensor has responded and state is active, reset state
+    elif dT < dt.timedelta(minutes=MAX_INTERVAL_MIN) and os.path.exists(device_path):
+        os.remove(device_path)
