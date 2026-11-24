@@ -73,5 +73,7 @@ for device in devices:
     
     # If sensor has responded and state is active, reset state, send alert
     elif dT < dt.timedelta(minutes=MAX_INTERVAL_MIN) and os.path.exists(device_path):
-        os.remove(device_path)
         alert = f"[{now_str}]: {device["name"]} is back online !"
+        print(alert)
+        notify(alert)
+        os.remove(device_path)
