@@ -18,7 +18,7 @@ CORS(app)
 
 
 config = ConfigLoader("broker.config").load()
-api_config = ConfigLoader("api.config").load()
+
 DB_PATH = config["database_name"]
 
 
@@ -30,6 +30,7 @@ def get_local_ip():
         s.connect(("8.8.8.8", 80))  # no data is sent, it only picks the outgoing interface
         return s.getsockname()[0]
     except OSError:
+        print("oserror")
         return "127.0.0.1"
     finally:
         s.close()
@@ -38,10 +39,7 @@ def get_local_ip():
 # index page
 @app.route("/")
 def index():
-    #return "index"
-    api_url = api_config["api_url"]
-    if api_url == "None":
-        api_url = "http://"+ get_local_ip()+":80/api"
+    api_url = request.host_url.rstrip("/") + "/api"
     print("using api_url:",api_url)
     return render_template("index(1).html",api_url=api_url)
 
