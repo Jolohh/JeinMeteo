@@ -33,6 +33,10 @@ def validate_device_type(device_type: str) -> str:
         raise UnknownDeviceType(f"unknown device type {device_type!r}, valid types: {valid}")
     return device_type
 
+def get_device_types():
+    valid = ", ".join(sorted(SENSOR_TYPES))
+    return valid
+
 
 def columns_for(device_type: str) -> tuple[str, ...]:
     return tuple(SENSOR_TYPES[device_type])

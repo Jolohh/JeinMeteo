@@ -4,7 +4,7 @@ from dataclasses import dataclass
 import json
 
 from jeinmeteo.configloader import ConfigLoader
-from jeinmeteo.sensor_types import validate_device_type, create_table_sql, table_name, columns_for,validate_values
+from jeinmeteo.sensor_types import validate_device_type, create_table_sql, table_name, columns_for,validate_values, get_device_types
 
 config = ConfigLoader("api.config").load()
 
@@ -128,4 +128,5 @@ class SensorDB:
         return Device(cur.lastrowid, hwid, name, device_type)
             
 
-        
+    def get_device_types(self):
+        return get_device_types()

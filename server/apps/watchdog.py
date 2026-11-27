@@ -1,6 +1,6 @@
 import datetime as dt
 from jeinmeteo.configloader import ConfigLoader
-from jeinmeteo.api import JeinMeteoAPI
+from jeinmeteo.sensordb import SensorDB
 import requests
 import json
 import os
@@ -17,9 +17,10 @@ STATEFILE_LOCATION = watchdog_config["statefile_location"]
 MAX_INTERVAL_MIN =  int(watchdog_config["max_interval_min"])
 NOTIFICATION_INTERVAL_H = int(watchdog_config["notification_interval_h"])
 
-api = JeinMeteoAPI()
+db = SensorDB()
 
-devices = api.get_devices_json()
+devices = db.get_devices()
+
 
 def notify(msg):
     requests.post(f"https://ntfy.sh/{watchdog_config["topic"]}",
@@ -54,10 +55,14 @@ def canNotify(path):
 
 # main function
 for device in devices:
-    device_path = os.path.join(STATEFILE_LOCATION,device["name"]+"_state.txt")
+    device_path = os.path.join(STATEFILE_LOCATION,device.name+"_state.txt")
 
-    # get latest response and calculate difference to current time    
-    latest = api.get_latest(device["name"])[0]
+    # get latest response and calculate difference to current time
+    try:
+        latest = db.get_by_name(device.name,latest_only=True)[0]
+    except IndexError:
+        print(f"list index out of range, table for {device.name}  might be empty")
+
     timestamp = dt.datetime.strptime(latest["date"],"%Y/%m/%d-%H:%M:%S")
     dT = dt.datetime.now() - timestamp
 
@@ -65,7 +70,7 @@ for device in devices:
     
     # if sensor has not responded and notification can be sent, send alert
     if dT > dt.timedelta(minutes=MAX_INTERVAL_MIN) and canNotify(device_path):    
-        alert = f"[{now_str}]: {device["name"]} offline alert! , sensor has not responded in {format_timedelta(dT)}"
+        alert = f"[{now_str}]: {device.name} offline alert! , sensor has not responded in {format_timedelta(dT)}"
         print(alert)        
         notify(alert)
         with open(device_path,"w") as f:
@@ -73,7 +78,7 @@ for device in devices:
     
     # If sensor has responded and state is active, reset state, send alert
     elif dT < dt.timedelta(minutes=MAX_INTERVAL_MIN) and os.path.exists(device_path):
-        alert = f"[{now_str}]: {device["name"]} is back online !"
+        alert = f"[{now_str}]: {device.name} is back online !"
         print(alert)
         notify(alert)
         os.remove(device_path)

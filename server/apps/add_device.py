@@ -1,17 +1,17 @@
-from jeinmeteo.device_registry import Device_registry
 from jeinmeteo.configloader import ConfigLoader
+from jeinmeteo.sensordb import SensorDB
 
-registry = Device_registry()
 config = ConfigLoader("broker.config").load()
 
+db = SensorDB()
 
 print("============================================")
 hwid = input("Hardware-ID/Identifier eingeben: ")
 print("============================================")
 name = input("Namen eingeben: ")
 print("============================================")
-print("Die möglichen Gerätetypen sind:",config["device_types"])
+print("Die möglichen Gerätetypen sind:",db.get_device_types())
 device_type = input("Gerätetypen eingeben: ")
 
 
-registry.add_device(hwid,name,device_type)
+db.add_device(name,hwid,device_type)
